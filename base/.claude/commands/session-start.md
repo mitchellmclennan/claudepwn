@@ -5,6 +5,8 @@ description: Bootstrap sequence for every new Claude Code session. Run this firs
 
 Execute the session bootstrap in this exact order:
 
+0. **claude-mem auto-inject**: claude-mem automatically injects relevant observations from prior sessions at session start. Review what it surfaces — it may contain context about what was tried before, what failed, and decisions made.
+
 1. **Board check**: Read BOARD.md. List any open blockers or messages. If a BLOCKER exists for your current task, skip to step 5 and find an unblocked task.
 
 2. **Dispatch check**: Read DISPATCH.md. Find your current assigned task(s). If nothing is assigned, read ROADMAP.md and self-assign the next unstarted task.

@@ -93,18 +93,35 @@ If your project has domain-specific safety requirements (e.g., financial precisi
 
 ---
 
+## Wave 7: Plugin PR Review (if using GitHub PRs)
+
+- [ ] Create a PR from the sprint branch if one doesn't exist:
+  `gh pr create --title "[sprint-N] Sprint N: implementation + hardening" --body "All waves 0-6 passed."`
+- [ ] Trigger Code Review plugin: comment `@claude review once` on the PR
+- [ ] Wait for review completion: `gh pr checks`
+- [ ] Read all inline comments — address every finding with confidence >= 80:
+  - RED findings: fix immediately
+  - YELLOW findings: fix or document why acceptable
+  - GRAY (pre-existing): log to BOARD.md for future sprint
+- [ ] Push fixes and verify review threads auto-resolve
+
+If NOT using GitHub PRs: Wave 7 is auto-PASS. Document: "Wave 7: SKIP (no GitHub PR workflow)"
+
+---
+
 ## Final Verdict
 
 Post to BOARD.md:
 ```
 [HARDENING] Sprint [N] — [PASS | FAIL]
 Wave 0 (Pre-Check): [PASS/FAIL]
-Wave 1 (Tests): [PASS/FAIL]
-Wave 2 (Security): [PASS/FAIL]
-Wave 3 (Review): [PASS/FAIL]
+Wave 1 (Tests): [PASS/FAIL] — Tests: X passed, Coverage: Y%
+Wave 2 (Security): [PASS/FAIL] — Issues: N (+ Security Review plugin active during impl: YES/NO)
+Wave 3 (Review): [PASS/FAIL] — Verdict: APPROVED/NEEDS_CHANGES (two-stage: spec + quality)
 Wave 4 (Dependencies): [PASS/FAIL]
-Wave 5 (Docs/Vault): [PASS/FAIL]
+Wave 5 (Docs/Vault): [PASS/FAIL] — Notes updated: N, created: N
 Wave 6 (Domain Safety): [PASS/FAIL or N/A]
+Wave 7 (Plugin PR Review): [PASS/FAIL or SKIP] — PR #N, findings addressed: X/Y
 ```
 
 If ALL waves PASS → sprint is clear to close. Run `/sprint-end`.

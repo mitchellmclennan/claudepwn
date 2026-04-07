@@ -35,3 +35,11 @@ MUST_FIX items:
 **Stage 2 — Code Quality:** Is it clean, tested, secure, and maintainable? Does it follow project patterns?
 
 Both stages must pass for APPROVED.
+
+## Plugin Integration
+
+The **Code Review plugin** provides a second, independent review layer on GitHub PRs. Your local review (this agent) catches issues before the PR is created. The plugin review (Wave 7 of hardening) catches anything you missed, with 5 parallel agents and confidence scoring.
+
+Your review and the plugin review are complementary, not redundant:
+- **You** review against project-specific rules, architecture, and context
+- **Plugin** reviews for general code quality, bugs, and security patterns

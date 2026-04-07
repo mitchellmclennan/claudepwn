@@ -49,6 +49,15 @@ At the start of every session, run `/session-start` or follow this sequence:
 - Design-before-code: No implementation without an approved design (`.claude/rules/design-before-code.md`)
 - Research protocol: If confidence <80% on any API, error, or library, WebSearch first (`.claude/rules/research-protocol.md`)
 
+## Active Plugins
+
+The following plugins fire automatically — do not disable them:
+
+- **Security Review** (`security-guidance`) — PreToolUse hook scans every Write/Edit for vulnerabilities (injection, XSS, eval, pickle, SQLi) BEFORE edits land. Real-time defense layer. Complements SecurityAgent's Wave 2 audit.
+- **Code Review** (`code-review`) — 5-agent parallel PR review triggered at Wave 7 of hardening. Posts inline GitHub comments with confidence scores.
+- **Frontend Design** (`frontend-design`) — Activates automatically on frontend tasks. Enforces distinctive design (anti-generic-AI-aesthetic).
+- **claude-mem** — Captures all session activity, injects relevant prior observations at session start. Gives you memory across sessions. Vault = project knowledge, claude-mem = session knowledge.
+
 ## Do Not Touch
 
 - `.env` files (never commit, never read secrets)
