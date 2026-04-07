@@ -1,0 +1,54 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Write(**)",
+      "Edit(**)",
+      "Glob(**)",
+      "Grep(**)",
+      "TodoWrite",
+      "TodoRead"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf .git)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | bash)",
+      "Bash(drop database*)",
+      "Bash(DROP TABLE*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-edit.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-bash.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

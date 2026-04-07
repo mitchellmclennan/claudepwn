@@ -1,0 +1,68 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Write(**)",
+      "Edit(**)",
+      "Glob(**)",
+      "Grep(**)",
+      "TodoWrite",
+      "TodoRead",
+      "Bash(uv run pytest*)",
+      "Bash(uv run ruff*)",
+      "Bash(uv run mypy*)",
+      "Bash(uv run bandit*)",
+      "Bash(uv run pip*)",
+      "Bash(python -m pytest*)",
+      "Bash(pip audit*)",
+      "Bash(safety check*)",
+      "Bash(git *)",
+      "Bash(chmod +x *)",
+      "Bash(mkdir -p *)",
+      "Bash(ls *)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf .git)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | bash)",
+      "Bash(drop database*)",
+      "Bash(DROP TABLE*)",
+      "Bash(*SECRET*)",
+      "Bash(*PRIVATE_KEY*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-edit.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-bash.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

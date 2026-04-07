@@ -1,0 +1,45 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+target/
+vendor/
+
+# Build output
+dist/
+build/
+*.egg-info/
+.next/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Secrets (paranoid)
+*.pem
+*.key
+credentials.json
+service-account.json
