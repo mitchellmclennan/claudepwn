@@ -2,19 +2,20 @@
 set -euo pipefail
 
 # ──────────────────────────────────────────────────────────────
-# claude-project-template — init.sh
+# claudepwn — init.sh
 #
 # Sets up a fully-configured Claude Code automation environment.
-# Clone this repo, run init.sh in your project, Claude does the rest.
 #
 # Usage:
-#   /path/to/init.sh                          # interactive
+#   npx claudepwn --name my-api --stack python --features all
+#   npx claudepwn --help
+#
+# Or clone and run directly:
 #   /path/to/init.sh --name my-api --stack python
-#   /path/to/init.sh --name my-app --stack typescript --features vault,checklists
-#   /path/to/init.sh --name my-svc --stack rust --minimal
 # ──────────────────────────────────────────────────────────────
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# CLAUDEPWN_ROOT is set by bin/claudepwn.js when run via npx
+SCRIPT_DIR="${CLAUDEPWN_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
 TARGET_DIR="$(pwd)"
 
 # Colors
