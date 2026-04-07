@@ -1,0 +1,16 @@
+node_modules
+.next
+dist
+coverage
+.git
+.env
+.env.*
+!.env.example
+logs/
+.claude/session-*
+.claude/vault-drift-queue.txt
+.gitnexus/lbug
+__pycache__
+*.pyc
+target
+.venv

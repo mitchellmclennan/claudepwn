@@ -57,17 +57,22 @@ That's it. Drop your `PRD.md` in the root and run `claude` — Claude reads ever
 | **Agents** | `.claude/agents/` | Architect, Implementer, Tester, Reviewer, Security, Docs, VaultKeeper, Dispatcher |
 | **Commands** | `.claude/commands/` | `/session-start`, `/session-end`, `/sprint-start`, `/sprint-end`, `/checkpoint`, `/status`, `/dispatch`, `/sync-vault`, `/research`, `/harden` |
 | **Rules** | `.claude/rules/` | code-style, git-protocol, no-regressions, security-rules, test-first, design-before-code, research-protocol |
-| **Hooks** | `.claude/hooks/` | pre-edit (block .env edits), post-edit (auto-lint), post-bash, pre-commit (block secrets) |
-| **Skills** | `.claude/skills/` | session-gate, sprint-review, harden |
-| **Settings** | `.claude/settings.json` | Permissions, hooks config (stack-specific) |
+| **Hooks** | `.claude/hooks/` | pre-edit (block .env), post-edit (auto-lint + drift queue), post-bash (GitNexus refresh), pre-commit (block secrets) |
+| **Skills** | `.claude/skills/` | session-gate, sprint-review, harden + 6 GitNexus skills |
+| **Settings** | `.claude/settings.json` | Permissions, hooks, plugins (stack-specific) |
+| **Plugins** | `settings.json` | security-guidance, code-review, frontend-design, claude-mem (configured in settings, installed via `--features plugins`) |
 
 ### Optional Features (`--features`)
 
 | Feature | Flag | What It Adds |
 |---------|------|-------------|
-| **Vault** | `vault` | Obsidian-compatible knowledge vault with 10 directories, index, conventions |
+| **Vault** | `vault` | Obsidian-compatible knowledge vault with 10 directories, READMEs, index, note template, conventions |
 | **Checklists** | `checklists` | Epic, sprint, and session checklist templates |
-| **Sprint Runner** | `sprints` | `scripts/run-sprints.sh` + prompt templates for Plan/Implement/Harden/Close phases |
+| **Sprint Runner** | `sprints` | `scripts/run-sprints.sh` (Opus/Sonnet/Haiku model routing), prompt templates, TMUX orchestration (start/stop/snapshot) |
+| **GitNexus** | `gitnexus` | Code knowledge graph, 6 GitNexus skills, auto-generated per-cluster skills, post-bash hook refresh |
+| **Plugins** | `plugins` | Installs 4 Claude Code plugins: security-guidance (real-time PreToolUse scan), code-review (5-agent PR analysis), frontend-design (anti-slop UI), claude-mem (cross-session memory) |
+| **Monorepo** | `monorepo` | pnpm-workspace.yaml, tsconfig.base.json, .node-version, .dockerignore, apps/ + packages/ directories |
+| **Everything** | `all` | All of the above |
 
 ## Stacks
 

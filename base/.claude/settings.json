@@ -1,13 +1,17 @@
 {
   "permissions": {
     "allow": [
+      "Bash(*)",
       "Read(**)",
       "Write(**)",
       "Edit(**)",
+      "MultiEdit(**)",
       "Glob(**)",
       "Grep(**)",
       "TodoWrite",
-      "TodoRead"
+      "TodoRead",
+      "WebSearch",
+      "WebFetch(*)"
     ],
     "deny": [
       "Bash(rm -rf /)",
@@ -50,5 +54,11 @@
         ]
       }
     ]
-  }
+  },
+  "plugins": [
+    "security-guidance@anthropics-claude-code",
+    "code-review@anthropics-claude-code",
+    "frontend-design@anthropics-claude-code",
+    "claude-mem@thedotmack"
+  ]
 }

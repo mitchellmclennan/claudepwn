@@ -18,7 +18,10 @@
       "Bash(git *)",
       "Bash(chmod +x *)",
       "Bash(mkdir -p *)",
-      "Bash(ls *)"
+      "Bash(ls *)",
+      "MultiEdit(**)",
+      "WebSearch",
+      "WebFetch(*)"
     ],
     "deny": [
       "Bash(rm -rf /)",
@@ -63,5 +66,11 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "security-guidance@anthropics-claude-code": true,
+    "code-review@anthropics-claude-code": true,
+    "frontend-design@anthropics-claude-code": true,
+    "claude-mem@thedotmack": true
   }
 }

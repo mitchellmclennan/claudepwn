@@ -41,6 +41,13 @@ Status: [PROPOSED | ACCEPTED | DEPRECATED]
 [What we rejected and why]
 ```
 
+## Before Any Design Decision (if GitNexus is available)
+
+- Read `gitnexus://repo/__PROJECT_NAME__/clusters` to understand current module boundaries
+- Read `gitnexus://repo/__PROJECT_NAME__/processes` to see existing execution flows
+- Run `gitnexus impact` on any symbol you plan to modify — respect the blast radius
+- If your design crosses cluster boundaries, document it in the ADR
+
 ## Rules
 
 - Never design more than one sprint ahead without re-reading BOARD.md

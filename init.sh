@@ -45,8 +45,9 @@ Usage: init.sh [options]
 Options:
   --name, -n NAME       Project name (default: directory name)
   --stack, -s STACK     Tech stack: python, typescript, rust, go (default: detect or ask)
-  --features FEATURES   Comma-separated: vault, checklists, sprints, gitnexus, plugins
-  --minimal             Agents + rules + hooks only (no vault, checklists, scripts)
+  --features FEATURES   Comma-separated: vault, checklists, sprints, gitnexus, plugins, monorepo
+                        Use 'all' to enable everything
+  --minimal             Agents + rules + hooks only (no vault, checklists, scripts, etc.)
   --force               Overwrite existing files (backs up originals as .bak)
   --no-git              Skip git init
   --yes, -y             Accept defaults without prompting
@@ -59,11 +60,12 @@ Examples:
   init.sh  # interactive mode
 
 What this does:
-  1. Copies .claude/ folder (agents, commands, rules, hooks, skills)
+  1. Copies .claude/ folder (agents, commands, rules, hooks, skills, plugins, GitNexus)
   2. Creates CLAUDE.md, AGENTS.md, BOARD.md, DISPATCH.md, ROADMAP.md, REVIEW.md
   3. Applies stack-specific overrides (Python/TS/Rust/Go lint, test, format commands)
-  4. Optionally creates vault/, checklists/, scripts/
-  5. You drop your PRD.md in the root — Claude reads it natively
+  4. Installs Claude Code plugins (security-review, code-review, frontend-design, claude-mem)
+  5. Optionally: vault, checklists, sprint runner, GitNexus, monorepo scaffold
+  6. You drop your PRD.md in the root — Claude reads it natively
 EOF
     exit 0
 }
@@ -144,6 +146,7 @@ FEAT_CHECKLISTS=false
 FEAT_SPRINTS=false
 FEAT_GITNEXUS=false
 FEAT_PLUGINS=false
+FEAT_MONOREPO=false
 
 if [[ "$MINIMAL" == true ]]; then
     : # all features off
@@ -157,7 +160,8 @@ elif [[ -n "$FEATURES" ]]; then
             sprints)    FEAT_SPRINTS=true ;;
             gitnexus)   FEAT_GITNEXUS=true ;;
             plugins)    FEAT_PLUGINS=true ;;
-            all)        FEAT_VAULT=true; FEAT_CHECKLISTS=true; FEAT_SPRINTS=true; FEAT_GITNEXUS=true; FEAT_PLUGINS=true ;;
+            monorepo)   FEAT_MONOREPO=true ;;
+            all)        FEAT_VAULT=true; FEAT_CHECKLISTS=true; FEAT_SPRINTS=true; FEAT_GITNEXUS=true; FEAT_PLUGINS=true; FEAT_MONOREPO=true ;;
             *)          echo -e "${YELLOW}Warning: unknown feature '$feat', skipping${NC}" ;;
         esac
     done
@@ -166,9 +170,10 @@ elif [[ "$SKIP_CONFIRM" == false ]]; then
     echo "Optional features (comma-separated, or 'all', or press Enter to skip):"
     echo "  vault       — Obsidian-compatible knowledge vault"
     echo "  checklists  — Epic/sprint/session checklists"
-    echo "  sprints     — Multi-phase sprint runner + prompt templates"
-    echo "  gitnexus    — Code knowledge graph integration"
-    echo "  plugins     — Plugin ecosystem (security-review, code-review, etc.)"
+    echo "  sprints     — Multi-phase sprint runner + prompt templates + TMUX orchestration"
+    echo "  gitnexus    — Code knowledge graph + auto-generated per-cluster skills"
+    echo "  plugins     — Install all 4 plugins (security-review, code-review, frontend-design, claude-mem)"
+    echo "  monorepo    — pnpm workspace, tsconfig.base, .dockerignore, .node-version"
     echo ""
     read -rp "Features [none]: " FEATURES_INPUT
     if [[ -n "$FEATURES_INPUT" ]]; then
@@ -181,7 +186,8 @@ elif [[ "$SKIP_CONFIRM" == false ]]; then
                 sprints)    FEAT_SPRINTS=true ;;
                 gitnexus)   FEAT_GITNEXUS=true ;;
                 plugins)    FEAT_PLUGINS=true ;;
-                all)        FEAT_VAULT=true; FEAT_CHECKLISTS=true; FEAT_SPRINTS=true; FEAT_GITNEXUS=true; FEAT_PLUGINS=true ;;
+                monorepo)   FEAT_MONOREPO=true ;;
+                all)        FEAT_VAULT=true; FEAT_CHECKLISTS=true; FEAT_SPRINTS=true; FEAT_GITNEXUS=true; FEAT_PLUGINS=true; FEAT_MONOREPO=true ;;
             esac
         done
     fi
@@ -197,7 +203,7 @@ echo -e "  Project:    ${GREEN}${PROJECT_NAME}${NC}"
 echo -e "  Stack:      ${GREEN}${STACK}${NC}"
 echo -e "  Target:     ${BLUE}${TARGET_DIR}${NC}"
 echo -e "  Features:   vault=${FEAT_VAULT} checklists=${FEAT_CHECKLISTS} sprints=${FEAT_SPRINTS}"
-echo -e "              gitnexus=${FEAT_GITNEXUS} plugins=${FEAT_PLUGINS}"
+echo -e "              gitnexus=${FEAT_GITNEXUS} plugins=${FEAT_PLUGINS} monorepo=${FEAT_MONOREPO}"
 echo -e "${BOLD}═══════════════════════════════════════════════${NC}"
 
 if [[ "$SKIP_CONFIRM" == false ]]; then
@@ -333,6 +339,34 @@ if [[ "$FEAT_SPRINTS" == true ]]; then
     chmod +x "$TARGET_DIR/scripts/"*.sh 2>/dev/null || true
 fi
 
+# ── GitNexus setup ────────────────────────────────────────────
+
+if [[ "$FEAT_GITNEXUS" == true ]]; then
+    echo -e "${BLUE}Setting up GitNexus knowledge graph...${NC}"
+    mkdir -p "$TARGET_DIR/.gitnexus"
+    mkdir -p "$TARGET_DIR/.claude/skills/generated"
+    # Run initial analysis if npx is available
+    if command -v npx &>/dev/null; then
+        echo -e "${BLUE}  Running initial graph analysis...${NC}"
+        cd "$TARGET_DIR"
+        npx gitnexus analyze --skills --force 2>/dev/null || echo -e "${YELLOW}  GitNexus not installed. Run: npx gitnexus analyze --skills --force${NC}"
+        cd "$OLDPWD" 2>/dev/null || true
+    else
+        echo -e "${YELLOW}  npx not found. Install Node.js, then run: npx gitnexus analyze --skills --force${NC}"
+    fi
+fi
+
+# ── Monorepo scaffold ────────────────────────────────────────
+
+if [[ "$FEAT_MONOREPO" == true ]]; then
+    echo -e "${BLUE}Creating monorepo scaffold...${NC}"
+    mkdir -p "$TARGET_DIR/apps" "$TARGET_DIR/packages"
+    while IFS= read -r src; do
+        relative="${src#$SCRIPT_DIR/monorepo/}"
+        safe_copy "$src" "$TARGET_DIR/$relative"
+    done < <(find "$SCRIPT_DIR/monorepo" -type f)
+fi
+
 # ── Make hooks executable ─────────────────────────────────────
 
 chmod +x "$TARGET_DIR/.claude/hooks/"*.sh 2>/dev/null || true
@@ -343,10 +377,28 @@ if [[ "$NO_GIT" == false && ! -d "$TARGET_DIR/.git" ]]; then
     echo -e "${BLUE}Initializing git repository...${NC}"
     cd "$TARGET_DIR"
     git init -q
-    # Symlink pre-commit hook if we have one
+    # Symlink pre-commit hook
     if [[ -f "$TARGET_DIR/.claude/hooks/pre-commit.sh" ]]; then
         mkdir -p "$TARGET_DIR/.git/hooks"
         ln -sf "../../.claude/hooks/pre-commit.sh" "$TARGET_DIR/.git/hooks/pre-commit"
+    fi
+fi
+
+# ── Install plugins ───────────────────────────────────────────
+
+if [[ "$FEAT_PLUGINS" == true ]]; then
+    echo -e "${BLUE}Installing Claude Code plugins...${NC}"
+    if command -v claude &>/dev/null; then
+        claude plugin install security-guidance@anthropics-claude-code 2>/dev/null || echo -e "${YELLOW}  security-guidance: install manually with: claude plugin install security-guidance@anthropics-claude-code${NC}"
+        claude plugin install code-review@anthropics-claude-code 2>/dev/null || echo -e "${YELLOW}  code-review: install manually with: claude plugin install code-review@anthropics-claude-code${NC}"
+        claude plugin install frontend-design@anthropics-claude-code 2>/dev/null || echo -e "${YELLOW}  frontend-design: install manually with: claude plugin install frontend-design@anthropics-claude-code${NC}"
+        claude plugin install claude-mem@thedotmack 2>/dev/null || echo -e "${YELLOW}  claude-mem: install manually with: claude plugin install claude-mem@thedotmack${NC}"
+    else
+        echo -e "${YELLOW}  Claude CLI not found. Install plugins manually after installing Claude Code:${NC}"
+        echo "    claude plugin install security-guidance@anthropics-claude-code"
+        echo "    claude plugin install code-review@anthropics-claude-code"
+        echo "    claude plugin install frontend-design@anthropics-claude-code"
+        echo "    claude plugin install claude-mem@thedotmack"
     fi
 fi
 
