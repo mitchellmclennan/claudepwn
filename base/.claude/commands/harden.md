@@ -54,12 +54,42 @@ Post verdict to BOARD.md.
 
 ---
 
-## Wave 4: Documentation
+## Wave 4: Dependency & Impact Analysis
 
-- [ ] All new/changed APIs documented
+- [ ] Run dependency analysis on all modified modules (if GitNexus enabled: `gitnexus impact`)
+- [ ] Check for circular dependencies introduced this sprint
+- [ ] Verify no orphaned modules (dead code with no callers)
+- [ ] Confirm all modified call chains are covered by tests
+- [ ] If no dependency tool: manually trace imports of every modified file
+
+Post result to BOARD.md.
+
+---
+
+## Wave 5: Documentation & Vault Sync
+
+- [ ] All new/changed APIs documented (vault/04-APIs/ or docs/)
 - [ ] ADRs written for non-obvious design decisions
-- [ ] Sprint retrospective written
+- [ ] Sprint retrospective written (vault/09-Retrospectives/ or docs/)
 - [ ] README updated if user-facing behavior changed
+- [ ] Vault notes updated for any new patterns, models, or infrastructure
+- [ ] Research notes freshness check: flag any in vault/08-Research/ older than 14 days
+- [ ] Vault index rebuilt (vault/_meta/vault-index.md)
+- [ ] No broken wikilinks in vault
+
+Post result to BOARD.md.
+
+---
+
+## Wave 6: Domain Safety (Optional — project-specific)
+
+If your project has domain-specific safety requirements (e.g., financial precision, live-trade lockout, PII handling, deployment gates), add them here:
+
+- [ ] [Domain-specific check 1]
+- [ ] [Domain-specific check 2]
+- [ ] [Domain-specific check 3]
+
+> Edit this wave to match your project's risk profile. Delete if not applicable.
 
 ---
 
@@ -72,7 +102,9 @@ Wave 0 (Pre-Check): [PASS/FAIL]
 Wave 1 (Tests): [PASS/FAIL]
 Wave 2 (Security): [PASS/FAIL]
 Wave 3 (Review): [PASS/FAIL]
-Wave 4 (Docs): [PASS/FAIL]
+Wave 4 (Dependencies): [PASS/FAIL]
+Wave 5 (Docs/Vault): [PASS/FAIL]
+Wave 6 (Domain Safety): [PASS/FAIL or N/A]
 ```
 
 If ALL waves PASS → sprint is clear to close. Run `/sprint-end`.

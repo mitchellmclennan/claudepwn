@@ -269,7 +269,7 @@ while IFS= read -r src; do
 done < <(find "$SCRIPT_DIR/base/.claude" -type f)
 
 # Copy root markdown files
-for md in CLAUDE.md AGENTS.md BOARD.md DISPATCH.md ROADMAP.md REVIEW.md .gitignore; do
+for md in CLAUDE.md AGENTS.md BOARD.md DISPATCH.md ROADMAP.md REVIEW.md .gitignore .env.example; do
     if [[ -f "$SCRIPT_DIR/base/$md" ]]; then
         safe_copy "$SCRIPT_DIR/base/$md" "$TARGET_DIR/$md"
     fi

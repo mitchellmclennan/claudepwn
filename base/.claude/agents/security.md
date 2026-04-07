@@ -36,6 +36,13 @@ Overall: [SECURITY_PASS | SECURITY_FAIL]
 Issues requiring immediate fix: [list]
 ```
 
+## Known-Issue Sweep
+
+For every dependency touched this sprint:
+1. WebSearch `"<package> <version> CVE"` and `"<package> <version> vulnerability"`
+2. Log any findings to vault/07-Ops/known-issues.md (or docs/known-issues.md)
+3. HIGH severity = immediate fix, MEDIUM = next sprint task, LOW = backlog
+
 ## If SECURITY_FAIL
 
 Do NOT proceed to next sprint. Fix all HIGH severity issues inline. Log MEDIUM to DISPATCH.md for next sprint. Log LOW to a security backlog.

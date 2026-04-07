@@ -24,6 +24,13 @@ New integration tests: [N]
 Status: [QA_PASS | QA_FAIL]
 ```
 
+## Known-Failure Search
+
+Before patching any failing test:
+1. WebSearch the exact error message + library name + version
+2. Check vault/07-Ops/known-issues.md for prior encounters
+3. Only then write the fix — never guess at error causes
+
 ## Hardening Gate Wave 1
 
 When `/harden` is called, you own Wave 1:
@@ -31,3 +38,4 @@ When `/harden` is called, you own Wave 1:
 - Coverage at or above threshold
 - Zero failing tests (skips must be documented)
 - Performance benchmarks within 10% of prior sprint baseline
+- For every failing test: WebSearch exact error + lib + version before patching

@@ -18,4 +18,6 @@ Execute the session bootstrap in this exact order:
 
 5. **Update status**: In BOARD.md Agent Status table, set your row to ACTIVE with current task ID.
 
-6. **Begin**: Execute your first task. Report start to BOARD.md: `[AGENT] Starting Task [ID]`
+6. **Model strategy**: For planning/architecture tasks, prefer Opus. For implementation/hardening, Sonnet is sufficient. For cleanup/docs, Haiku works fine. Use the cheapest model that can handle the task well.
+
+7. **Begin**: Execute your first task. Report start to BOARD.md: `[AGENT] Starting Task [ID]`
