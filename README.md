@@ -1,147 +1,140 @@
-# claude-project-template
+# claudepwn
 
-One command to set up a fully-configured Claude Code automation environment for any project.
+One command. PRD in, fully-automated Claude Code project out.
 
-8 agents. 10 slash commands. 7 rules. 4 hooks. 3 skills. Multi-wave hardening gate. Sprint runner. Vault. All wired up.
+8 agents. 10 commands. 7 rules. 4 hooks. 9 skills. 8-wave hardening. Sprint runner. Vault. 4 plugins. All wired. Claude reads your PRD and populates everything.
 
 ## Quick Start
 
 ```bash
-# Clone this repo
-git clone https://github.com/your-org/claude-project-template.git /tmp/cpt
+# New project from a PRD
+npx claudepwn new --prd ./PRD.md --features all
 
-# Run in your project directory
-cd ~/my-project
-/tmp/cpt/init.sh --name my-project --stack python
+# Add to an existing project
+cd ~/existing-project
+npx claudepwn init --prd ./PRD.md --features all
 ```
 
-That's it. Drop your `PRD.md` in the root and run `claude` — Claude reads everything natively.
+That's it. Claude reads the PRD, detects the stack, populates ROADMAP/DISPATCH/vault, writes ADRs, and kicks off Sprint 1.
 
-## Usage
+## Two Modes
+
+### `new` — Start a project from scratch
 
 ```bash
-# Interactive mode (prompts for name, stack, features)
-./init.sh
+npx claudepwn new --prd ./PRD.md --features all
+```
 
-# Fully specified
-./init.sh --name my-api --stack python --features vault,checklists
+1. Scaffolds entire `.claude/` structure (agents, commands, rules, hooks, skills)
+2. Extracts project name and tech stack from your PRD automatically
+3. Launches Claude headless to:
+   - Fill CLAUDE.md with real project description and stack
+   - Decompose PRD into Epics → Sprints in ROADMAP.md
+   - Write Sprint 1 tasks to DISPATCH.md with acceptance criteria
+   - Write ADRs for design decisions
+   - Populate vault with architecture docs
+   - Kick off Sprint 1
 
-# Auto-detect stack from existing files
-./init.sh --name my-app
+### `init` — Add to an existing codebase
 
-# All features
-./init.sh --name my-saas --stack typescript --features all
+```bash
+cd ~/my-existing-project
+npx claudepwn init --prd ./PRD.md --features all
+```
 
-# Minimal (agents + rules + hooks only)
-./init.sh --name my-script --stack python --minimal
+1. Same scaffold (non-destructive — skips existing files)
+2. Launches Claude to:
+   - **Audit** the existing codebase (tests, security, architecture, tech debt)
+   - Create **Sprint 0** with audit fix tasks
+   - Run hardening gate on Sprint 0
+   - Then read the PRD and plan forward sprints
 
-# Non-destructive (won't overwrite existing .claude/ files)
-./init.sh --name existing-project --stack go
+## Options
 
-# Force overwrite (backs up originals as .bak)
-./init.sh --name existing-project --stack go --force
+```
+--prd PATH          Your PRD file (Claude reads it, extracts name + stack)
+--name, -n NAME     Override project name (default: from PRD or directory)
+--stack, -s STACK   Override stack: python, typescript, rust, go (default: detected)
+--features FEAT     vault, checklists, sprints, gitnexus, plugins, monorepo, or 'all'
+--minimal           Agents + rules + hooks only
+--force             Overwrite existing files (creates .bak backups)
+--no-bootstrap      Scaffold files only — don't launch Claude
+--no-git            Skip git init
+--yes, -y           Accept defaults
 ```
 
 ## What You Get
 
-### Always Included
+### Always Included (base scaffold)
 
-| Component | Files | Purpose |
-|-----------|-------|---------|
-| **CLAUDE.md** | Root | Project briefing — Claude reads this first every session |
-| **AGENTS.md** | Root | 8 agent definitions with roles and responsibilities |
-| **BOARD.md** | Root | Agent communication board (shared state) |
-| **DISPATCH.md** | Root | Task routing and assignment log |
-| **ROADMAP.md** | Root | Epic → Sprint → Task breakdown |
-| **REVIEW.md** | Root | Code review conventions |
-| **Agents** | `.claude/agents/` | Architect, Implementer, Tester, Reviewer, Security, Docs, VaultKeeper, Dispatcher |
-| **Commands** | `.claude/commands/` | `/session-start`, `/session-end`, `/sprint-start`, `/sprint-end`, `/checkpoint`, `/status`, `/dispatch`, `/sync-vault`, `/research`, `/harden` |
-| **Rules** | `.claude/rules/` | code-style, git-protocol, no-regressions, security-rules, test-first, design-before-code, research-protocol |
-| **Hooks** | `.claude/hooks/` | pre-edit (block .env), post-edit (auto-lint + drift queue), post-bash (GitNexus refresh), pre-commit (block secrets) |
-| **Skills** | `.claude/skills/` | session-gate, sprint-review, harden + 6 GitNexus skills |
-| **Settings** | `.claude/settings.json` | Permissions, hooks, plugins (stack-specific) |
-| **Plugins** | `settings.json` | security-guidance, code-review, frontend-design, claude-mem (configured in settings, installed via `--features plugins`) |
+| Component | Count | Description |
+|-----------|-------|-------------|
+| **Agents** | 8 | Architect, Implementer, Tester, Reviewer, Security, Docs, VaultKeeper, Dispatcher |
+| **Commands** | 10 | /session-start, /session-end, /sprint-start, /sprint-end, /checkpoint, /status, /dispatch, /sync-vault, /research, /harden |
+| **Rules** | 7 | code-style, git-protocol, no-regressions, security-rules, test-first, design-before-code, research-protocol |
+| **Hooks** | 4 | pre-edit, post-edit (auto-lint + drift queue), post-bash (GitNexus refresh), pre-commit (secrets block) |
+| **Skills** | 9 | session-gate, sprint-review, harden + 6 GitNexus skills |
+| **Hardening** | 8 waves | Pre-check → Tests → Security → Review → Dependencies → Docs → Domain → Plugin PR |
+| **Plugins** | 4 | security-guidance (real-time), code-review (5-agent PR), frontend-design (anti-slop), claude-mem (cross-session memory) |
+| **Root files** | 7 | CLAUDE.md, AGENTS.md, BOARD.md, DISPATCH.md, ROADMAP.md, REVIEW.md, .env.example |
+| **Bootstrap** | 2 | bootstrap-new.md (PRD → plan), bootstrap-existing.md (audit → plan) |
 
 ### Optional Features (`--features`)
 
-| Feature | Flag | What It Adds |
-|---------|------|-------------|
-| **Vault** | `vault` | Obsidian-compatible knowledge vault with 10 directories, READMEs, index, note template, conventions |
-| **Checklists** | `checklists` | Epic, sprint, and session checklist templates |
-| **Sprint Runner** | `sprints` | `scripts/run-sprints.sh` (Opus/Sonnet/Haiku model routing), prompt templates, TMUX orchestration (start/stop/snapshot) |
-| **GitNexus** | `gitnexus` | Code knowledge graph, 6 GitNexus skills, auto-generated per-cluster skills, post-bash hook refresh |
-| **Plugins** | `plugins` | Installs 4 Claude Code plugins: security-guidance (real-time PreToolUse scan), code-review (5-agent PR analysis), frontend-design (anti-slop UI), claude-mem (cross-session memory) |
-| **Monorepo** | `monorepo` | pnpm-workspace.yaml, tsconfig.base.json, .node-version, .dockerignore, apps/ + packages/ directories |
-| **Everything** | `all` | All of the above |
+| Feature | What It Adds |
+|---------|-------------|
+| `vault` | 10-directory Obsidian vault with READMEs, note template, conventions, index |
+| `checklists` | Epic, sprint, session checklist templates |
+| `sprints` | Sprint runner (Opus/Sonnet/Haiku model routing), TMUX orchestration |
+| `gitnexus` | Code knowledge graph, auto-generated per-cluster skills |
+| `plugins` | Installs all 4 Claude Code plugins |
+| `monorepo` | pnpm-workspace.yaml, tsconfig.base.json, .node-version, .dockerignore |
+| `all` | Everything above |
 
-## Stacks
-
-The `--stack` flag applies stack-specific overrides:
+### Stack Overlays
 
 | Stack | Auto-detected by | Lint | Test | Format | Security |
 |-------|-----------------|------|------|--------|----------|
-| `python` | pyproject.toml, setup.py, requirements.txt | ruff | pytest | ruff format | bandit, pip audit |
-| `typescript` | package.json, tsconfig.json | eslint | vitest/jest | prettier | npm audit |
-| `rust` | Cargo.toml | clippy | cargo test | rustfmt | cargo audit |
-| `go` | go.mod | golangci-lint | go test | gofmt | govulncheck |
+| `python` | pyproject.toml, PRD keywords (fastapi, django, flask) | ruff | pytest | ruff format | bandit, pip audit |
+| `typescript` | package.json, PRD keywords (next.js, react, node) | eslint | vitest/jest | prettier | npm audit |
+| `rust` | Cargo.toml, PRD keywords (actix, axum, tokio) | clippy | cargo test | rustfmt | cargo audit |
+| `go` | go.mod, PRD keywords (gin, echo, golang) | golangci-lint | go test | gofmt | govulncheck |
 
-Stack overlays provide:
-- Stack-specific `.claude/settings.json` (permissions whitelist for that stack's tools)
-- Stack-specific `.claude/rules/code-style.md` (naming, patterns, commands)
-- Stack-specific `.claude/hooks/post-edit.sh` (auto-lint on save)
-- Stack-specific `.claude/hooks/pre-commit.sh` (lint + secrets check)
-
-## How It Works
-
-There's no template engine. No Python. No YAML parser. Just files.
-
-1. `init.sh` copies base files (agents, commands, rules, hooks, settings, root .md files)
-2. Stack overlay copies override base files with stack-specific versions
-3. `sed` replaces `__PROJECT_NAME__` and `__STACK__` placeholders
-4. Optional features copy additional directories (vault, checklists, scripts)
-5. Hooks get `chmod +x`, pre-commit gets symlinked to `.git/hooks/`
-
-Claude reads everything natively. Your PRD.md goes in the root. The Architect agent reads it at sprint start. No parsing needed — Claude IS the parser.
-
-## Workflow
+## The Flow
 
 ```
-1. Drop PRD.md in your project root
-2. Run: claude
-3. Run: /session-start
-4. Claude reads PRD → Architect decomposes into tasks → Implementer builds → Tester verifies → Reviewer approves → Security scans → Docs updates
-5. Run: /harden (multi-wave quality gate)
-6. Run: /sprint-end
-7. Repeat for next sprint
+PRD.md → npx claudepwn new --prd PRD.md --features all
+  ├── Scaffold 80+ files (.claude/, agents, commands, rules, hooks, skills)
+  ├── Detect stack from PRD (python/typescript/rust/go)
+  ├── Launch Claude (Opus) headless:
+  │   ├── Read PRD
+  │   ├── Fill CLAUDE.md with real stack + description
+  │   ├── Decompose into ROADMAP.md (Mega → Epic → Sprint)
+  │   ├── Write Sprint 1 tasks to DISPATCH.md
+  │   ├── Write ADRs for design decisions
+  │   ├── Populate vault with architecture docs
+  │   └── /sprint-start → Sprint 1 begins
+  └── Done. Run: scripts/run-sprints.sh 1
 ```
 
-## Non-Destructive
+For existing projects, `init` mode audits first, creates Sprint 0 for fixes, hardens, then plans forward.
 
-If your project already has `.claude/` files, init.sh **skips existing files** by default. Use `--force` to overwrite (creates `.bak` backups).
+## Headless / Auto Claude
 
-## Directory Structure After Init
+After bootstrap, run sprints headless:
 
+```bash
+# Run Sprint 1 (Plan → Implement → Harden → Close)
+./scripts/run-sprints.sh 1
+
+# Run Sprints 1-3
+./scripts/run-sprints.sh 1 3
+
+# With TMUX monitoring (detach with Ctrl+B, D)
+./scripts/tmux-start.sh
 ```
-your-project/
-├── CLAUDE.md                    ← Claude reads this first
-├── AGENTS.md                    ← Agent roster
-├── BOARD.md                     ← Agent communication
-├── DISPATCH.md                  ← Task tracking
-├── ROADMAP.md                   ← Sprint planning
-├── REVIEW.md                    ← Review conventions
-├── PRD.md                       ← YOUR product requirements (you create this)
-├── .claude/
-│   ├── settings.json            ← Permissions + hooks (stack-specific)
-│   ├── agents/                  ← 8 agent instruction files
-│   ├── commands/                ← 10 slash commands
-│   ├── rules/                   ← 7 rule files
-│   ├── hooks/                   ← 4 hook scripts
-│   └── skills/                  ← 3 skill packs
-├── vault/                       ← [optional] Knowledge vault
-├── checklists/                  ← [optional] Templates
-├── scripts/                     ← [optional] Sprint runner
-└── src/                         ← Your code
-```
+
+Model routing: Opus plans, Sonnet implements + hardens, Haiku closes.
 
 ## License
 

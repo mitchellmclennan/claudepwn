@@ -7,7 +7,8 @@
  * and calls init.sh with all arguments forwarded.
  *
  * Usage:
- *   npx claudepwn --name my-api --stack python --features all
+ *   npx claudepwn new --prd ./PRD.md --features all
+ *   npx claudepwn init --prd ./PRD.md --features all
  *   npx claudepwn --help
  */
 
