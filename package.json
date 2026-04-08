@@ -1,6 +1,6 @@
 {
   "name": "claudepwn",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "One command to set up a fully-configured Claude Code automation environment for any project. 8 agents, 10 commands, 7 rules, 4 hooks, 9 skills, 8-wave hardening gate, sprint runner, vault, plugins.",
   "bin": {
     "claudepwn": "./bin/claudepwn.js"
